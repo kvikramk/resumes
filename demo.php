@@ -75,7 +75,7 @@ function getconsecutive_capitalwords($strin){
 }
 
 function gethighlighted_words($strin){
-    preg_match_all("/\*(\w+\s\w+)\*/", $strin, $matches); //extract bolded words
+    preg_match_all("/\*([^\*]*?)\*/", $strin, $matches); //extract bolded words
     return $matches[1];
 }
 
