@@ -12,10 +12,10 @@ if (is_dir($path)) {
 function process_file($filename){
 
     $fileContent = shell_exec('antiword '.$filename." -f");
-    var_dump($fileContent);
+   // var_dump($fileContent);
     $arr = explode("\n", $fileContent);
     $LINENUMBERLIMIT=20; //Number of lines to be processed to fetch name, email and phone number;
-    $temp=trimnew_alines($arr);
+    $temp=trimnew_lines($arr);
     $relevantText=implode(" ",$temp);
     $emails=extract_emails($relevantText);
     foreach($emails as $email){
@@ -25,22 +25,26 @@ function process_file($filename){
     foreach($phones as $no){
         echo "Phone Number of the user is ".$no."<br/>";
     }
-    $boldWords=gethighlighted_words($relevantText);
-    var_dump($boldWords);
-    fetch_names($boldWords,$emails);
+    $boldWords=getconsecutive_capitalwords($relevantText);
+    fetch_names($boldWords,$emails[0]);
+    echo "<br/><br/>";
     //fetch_names($temp,$emails);   
 }
-function fetch_names($boldWords,$email){
+function fetch_names($wordsarray,$reference){
     $tempname="";
-    foreach($boldWords as $word){
-        var_dump($word);
+    foreach($wordsarray as $word){
         $wordsarray = explode(" ", $word);
         foreach($wordsarray as $keys){
-            if(stripos($email[0],$keys)!==FALSE){
+            if(stripos($reference,$keys)!==FALSE){
                 $tempname.=$keys." ";
             }
+
         }
-        $tempname=substr($tempname,0,-1);
+        if($tempname!==""){
+            $tempname=substr($tempname,0,-1);
+            break;    
+        }
+        
     }
     if(strlen($tempname)!==0){
         echo "Name of the User is $tempname <br/>";
@@ -65,7 +69,7 @@ function trimnew_lines($textarray){ // "\n" from a array
     return $returnArray;
 }
 
-function getconsecutive_capitalwords($str){
+function getconsecutive_capitalwords($strin){
     preg_match_all("/([A-Z][\w-]*(\s+[A-Z][\w-]*)+)/", $strin, $matches);
     return $matches[1]; 
 }
